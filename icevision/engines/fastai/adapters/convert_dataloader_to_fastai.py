@@ -3,6 +3,7 @@ __all__ = ["convert_dataloader_to_fastai"]
 from icevision.imports import *
 from icevision.engines.fastai.imports import *
 from torch.utils.data import SequentialSampler, RandomSampler
+from torch.utils.data.dataloader import _InfiniteConstantSampler
 
 
 def convert_dataloader_to_fastai(dataloader: DataLoader):
@@ -14,7 +15,7 @@ def convert_dataloader_to_fastai(dataloader: DataLoader):
             return (dataloader.collate_fn, raise_error_convert)[self.prebatched](b)
 
     # use the type of sampler to determine if shuffle is true or false
-    if isinstance(dataloader.sampler, SequentialSampler):
+    if isinstance(dataloader.sampler, (SequentialSampler, _InfiniteConstantSampler)):
         shuffle = False
     elif isinstance(dataloader.sampler, RandomSampler):
         shuffle = True

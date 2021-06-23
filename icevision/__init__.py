@@ -5,7 +5,6 @@ from icevision import tfms
 from icevision.data import *
 from icevision import backbones
 from icevision import models
-from icevision.models import *
 from icevision.metrics import *
 from icevision.visualize import *
 

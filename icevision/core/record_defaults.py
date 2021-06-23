@@ -1,7 +1,13 @@
-__all__ = ["ObjectDetectionRecord", "InstanceSegmentationRecord"]
+__all__ = [
+    "ObjectDetectionRecord",
+    "InstanceSegmentationRecord",
+    "SemanticSegmentationRecord",
+    "KeypointsRecord",
+]
 
 from icevision.core.record import *
 from icevision.core.record_components import *
+from icevision.core import tasks
 
 
 def ObjectDetectionRecord():
@@ -21,6 +27,16 @@ def InstanceSegmentationRecord():
             InstancesLabelsRecordComponent(),
             BBoxesRecordComponent(),
             MasksRecordComponent(),
+        )
+    )
+
+
+def SemanticSegmentationRecord():
+    return BaseRecord(
+        (
+            FilepathRecordComponent(),
+            ClassMapRecordComponent(task=tasks.segmentation),
+            SemanticMasksRecordComponent(),
         )
     )
 

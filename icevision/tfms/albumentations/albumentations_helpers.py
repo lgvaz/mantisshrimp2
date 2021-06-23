@@ -1,4 +1,4 @@
-__all__ = ["aug_tfms", "resize_and_pad"]
+__all__ = ["aug_tfms", "resize", "resize_and_pad"]
 
 import albumentations as A
 
@@ -6,8 +6,8 @@ from icevision.imports import *
 from icevision.core import *
 
 
-def _resize(size, ratio_resize=A.LongestMaxSize):
-    return ratio_resize(size) if isinstance(size, int) else A.Resize(*size)
+def resize(size, ratio_resize=A.LongestMaxSize):
+    return ratio_resize(size) if isinstance(size, int) else A.Resize(*size[::-1])
 
 
 def resize_and_pad(
@@ -16,8 +16,8 @@ def resize_and_pad(
         A.PadIfNeeded, border_mode=cv2.BORDER_CONSTANT, value=[124, 116, 104]
     ),
 ):
-    height, width = (size, size) if isinstance(size, int) else size
-    return [_resize(size), pad(min_height=height, min_width=width)]
+    width, height = (size, size) if isinstance(size, int) else size
+    return [resize(size), pad(min_height=height, min_width=width)]
 
 
 def aug_tfms(
@@ -44,7 +44,7 @@ def aug_tfms(
     # Arguments
         size: The final size of the image. If an `int` is given, the maximum size of
             the image is rescaled, maintaing aspect ratio. If a `tuple` is given,
-            the image is rescaled to have that exact size (height, width).
+            the image is rescaled to have that exact size (width, height).
         presizing: Rescale the image before applying other transfroms. If `None` this
                 transform is not applied. First introduced by fastai,this technique is
                 explained in their book in [this](https://github.com/fastai/fastbook/blob/master/05_pet_breeds.ipynb)
@@ -67,17 +67,17 @@ def aug_tfms(
         A list of albumentations transforms.
     """
 
-    height, width = (size, size) if isinstance(size, int) else size
+    width, height = (size, size) if isinstance(size, int) else size
 
     tfms = []
-    tfms += [_resize(presize, A.SmallestMaxSize) if presize is not None else None]
+    tfms += [resize(presize, A.SmallestMaxSize) if presize is not None else None]
     tfms += [horizontal_flip, shift_scale_rotate, rgb_shift, lightning, blur]
     # Resize as the last transforms to reduce the number of artificial artifacts created
     if crop_fn is not None:
         crop = crop_fn(height=height, width=width)
-        tfms += [A.OneOrOther(crop, _resize(size), p=crop.p)]
+        tfms += [A.OneOrOther(crop, resize(size), p=crop.p)]
     else:
-        tfms += [_resize(size)]
+        tfms += [resize(size)]
     tfms += [pad(min_height=height, min_width=width) if pad is not None else None]
 
     tfms = [tfm for tfm in tfms if tfm is not None]

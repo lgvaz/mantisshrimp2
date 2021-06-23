@@ -10,6 +10,7 @@ __all__ = [
     "ClassificationLabelsRecordComponent",
     "BBoxesRecordComponent",
     "MasksRecordComponent",
+    "SemanticMasksRecordComponent",
     "AreasRecordComponent",
     "IsCrowdsRecordComponent",
     "KeyPointsRecordComponent",
@@ -409,6 +410,51 @@ class MasksRecordComponent(RecordComponent):
 
     def as_dict(self) -> dict:
         return {"masks": self.masks}
+
+    def _builder_template(self) -> List[str]:
+        return ["record{task}add_masks(<Sequence[Mask]>)"]
+
+
+class SemanticMasksRecordComponent(RecordComponent):
+    def __init__(self, task=tasks.segmentation):
+        super().__init__(task=task)
+        # HACK: unloaded_mask is a hacky solution
+        self._unloaded_mask: Mask = None
+        self.masks: Sequence[Mask] = None
+
+    def set_mask(self, mask: Mask):
+        self._unloaded_mask = [mask]
+        # HACK: list here just because is what we need on instance segmentation
+        self.masks = [mask]
+
+    # HACK: only here because it's what albumentations call
+    def set_masks(self, masks: Mask):
+        self.masks = masks
+        # assert len(masks) == 1, "can only be a single mask for segmentation"
+        # self.set_mask(masks[0])
+
+    def setup_transform(self, tfm) -> None:
+        tfm.setup_masks(self)
+
+    def _load(self):
+        self.masks = MaskArray.from_masks(
+            self.masks, self.composite.height, self.composite.width
+        )
+
+    def _unload(self):
+        self.masks = None
+
+    # def _num_annotations(self) -> Dict[str, int]:
+    #     return {"masks": len(self.masks)}
+
+    # def _remove_annotation(self, i):
+    #     self.masks.pop(i)
+
+    def _repr(self) -> List[str]:
+        return [f"Masks: {self.masks}"]
+
+    def _builder_template(self) -> List[str]:
+        return ["record{task}set_masks(<Sequence[Mask]>)"]
 
 
 class AreasRecordComponent(RecordComponent):

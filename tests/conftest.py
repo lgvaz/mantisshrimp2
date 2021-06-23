@@ -38,6 +38,54 @@ def fridge_faster_rcnn_model() -> nn.Module:
     return faster_rcnn.model(num_classes=5, backbone=backbone)
 
 
+@pytest.fixture()
+def camvid_class_map(samples_source) -> ClassMap:
+    codes = list(np.loadtxt(samples_source / "camvid/codes.txt", dtype=str))
+    return ClassMap(codes, background=None)
+
+
+@pytest.fixture()
+def camvid_records(samples_source, camvid_class_map) -> RecordCollection:
+    images_dir = samples_source / "camvid/images"
+    labels_dir = samples_source / "camvid/labels"
+    image_files = get_image_files(images_dir)
+
+    records = RecordCollection(SemanticSegmentationRecord)
+
+    for image_file in pbar(image_files):
+        record = records.get_by_record_id(image_file.stem)
+
+        if record.is_new:
+            record.set_filepath(image_file)
+            record.set_img_size(get_img_size(image_file))
+            record.segmentation.set_class_map(camvid_class_map)
+
+        mask_file = SemanticMaskFile(labels_dir / f"{image_file.stem}_P.png")
+        record.segmentation.set_mask(mask_file)
+
+    records = records.autofix()
+    # list of 5 records
+    return records
+
+
+@pytest.fixture()
+def camvid_ds(camvid_records) -> Tuple[Dataset, Dataset]:
+
+    train_records, valid_records = camvid_records.make_splits(
+        RandomSplitter([0.8, 0.2], seed=0)
+    )
+
+    IMG_SIZE = 64
+    tfms_ = tfms.A.Adapter([A.Resize(IMG_SIZE, IMG_SIZE), A.Normalize()])
+
+    train_ds = Dataset(train_records, tfms_)
+    valid_ds = Dataset(valid_records, tfms_)
+    assert len(train_ds) == 4
+    assert len(valid_ds) == 1
+
+    return train_ds, valid_ds
+
+
 @pytest.fixture(scope="module")
 def fridge_ds(samples_source, fridge_class_map) -> Tuple[Dataset, Dataset]:
     IMG_SIZE = 384
