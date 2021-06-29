@@ -2,6 +2,7 @@ import pytest
 from icevision.all import *
 import albumentations as A
 from icevision.models.inference import postprocess_bbox
+from icevision.models.ross import efficientdet
 
 
 def test_e2e_detect(samples_source, fridge_efficientdet_model, fridge_class_map):

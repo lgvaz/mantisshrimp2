@@ -50,10 +50,12 @@ def adapted_fastai_learner(
                 "the model should define a method called `param_groups`"
             )
 
-    return fastai.Learner(
+    learn = fastai.Learner(
         dls=fastai_dls,
         model=model,
         metrics=fastai_metrics,
         splitter=splitter,
         **learner_kwargs,
     )
+    learn.freeze()
+    return learn

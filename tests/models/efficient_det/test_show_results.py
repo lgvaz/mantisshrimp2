@@ -1,4 +1,5 @@
 from icevision.all import *
+from icevision.models.ross import efficientdet
 
 
 def test_show_results(

@@ -13,11 +13,11 @@ from icevision.core import *
 class DataSplitter(ABC):
     """Base class for all data splitters."""
 
-    def __call__(self, idmap: IDMap):
-        return self.split(idmap=idmap)
+    def __call__(self, records: Sequence[BaseRecord]):
+        return self.split(records=records)
 
     @abstractmethod
-    def split(self, idmap: IDMap):
+    def split(self, records: Sequence[BaseRecord]):
         """Splits `ids` into groups.
 
         # Arguments
@@ -29,13 +29,13 @@ class DataSplitter(ABC):
 class SingleSplitSplitter(DataSplitter):
     """Return all items in a single group, without shuffling."""
 
-    def split(self, idmap: IDMap):
+    def split(self, records: Sequence[BaseRecord]):
         """Puts all `ids` in a single group.
 
         # Arguments
             idmap: idmap used for getting ids.
         """
-        return [idmap.get_ids()]
+        return [[record.record_id for record in records]]
 
 
 class RandomSplitter(DataSplitter):
@@ -65,21 +65,23 @@ class RandomSplitter(DataSplitter):
         self.probs = probs
         self.seed = seed
 
-    def split(self, idmap: IDMap):
+    def split(self, records: Sequence[BaseRecord]):
         """Randomly splits `ids` based on parameters passed to the constructor of this class.
 
         # Arguments
             idmap: idmap used for getting ids.
         """
-        ids = idmap.get_ids()
         # calculate split indexes
-        p = np.array(self.probs) * len(ids)  # convert percentage to absolute
+        p = np.array(self.probs) * len(records)  # convert percentage to absolute
         p = np.ceil(p).astype(int)  # round up, so each split has at least one example
-        p[p.argmax()] -= sum(p) - len(ids)  # removes excess from split with most items
+        p[p.argmax()] -= sum(p) - len(
+            records
+        )  # removes excess from split with most items
         p = np.cumsum(p)
 
         with np_local_seed(self.seed):
-            shuffled = np.random.permutation(list(ids))
+            shuffled = np.random.permutation([record.record_id for record in records])
+
         return np.split(shuffled, p.tolist())[:-1]  # last element is always empty
 
 
@@ -106,10 +108,10 @@ class FixedSplitter(DataSplitter):
     def __init__(self, splits: Sequence[Sequence[Hashable]]):
         self.splits = splits
 
-    def split(self, idmap: IDMap):
+    def split(self, records: Sequence[BaseRecord]):
         """Execute the split
 
         # Arguments
             idmap: idmap used for getting ids.
         """
-        return [[idmap.get_name(name) for name in names] for names in self.splits]
+        return self.splits

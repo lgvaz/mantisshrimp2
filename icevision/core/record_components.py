@@ -9,7 +9,9 @@ __all__ = [
     "InstancesLabelsRecordComponent",
     "ClassificationLabelsRecordComponent",
     "BBoxesRecordComponent",
-    "MasksRecordComponent",
+    "BaseMasksRecordComponent",
+    "InstanceMasksRecordComponent",
+    "SemanticMaskRecordComponent",
     "AreasRecordComponent",
     "IsCrowdsRecordComponent",
     "KeyPointsRecordComponent",
@@ -371,44 +373,145 @@ class BBoxesRecordComponent(RecordComponent):
         return ["record{task}add_bboxes(<Sequence[BBox]>)"]
 
 
-class MasksRecordComponent(RecordComponent):
-    def __init__(self, task=tasks.detection):
+class BaseMasksRecordComponent(RecordComponent):
+    def __init__(self, task):
         super().__init__(task=task)
-        self.masks = EncodedRLEs()
-
-    def set_masks(self, masks: Sequence[Mask]):
-        self.masks = masks
+        # masks are each individual part that composes the mask
+        # e.g. we can have multiple polygons, rles, etc
+        self.masks = self.mask_parts = []
+        self.mask_array: MaskArray = None
 
     def add_masks(self, masks: Sequence[Mask]):
-        self.masks.extend(self._masks_to_erle(masks))
+        self.masks.extend(masks)
+
+    def set_masks(self, masks: Sequence[Mask]):
+        self.masks.clear
+        self.masks.extend(masks)
+
+    def set_mask(self, mask: Mask):
+        return self.set_masks([mask])
+
+    def set_mask_array(self, mask_array: MaskArray):
+        self.mask_array = mask_array
+
+    def _load(self):
+        mask_array = MaskArray.from_masks(
+            self.masks, self.composite.height, self.composite.width
+        )
+        self.set_mask_array(mask_array)
+
+    def _unload(self):
+        self.mask_array = None
 
     def setup_transform(self, tfm) -> None:
         tfm.setup_masks(self)
 
-    def _masks_to_erle(self, masks: Sequence[Mask]) -> List[Mask]:
-        width, height = self.composite.img_size
-        return [mask.to_erles(h=height, w=width) for mask in masks]
-
-    def _load(self):
-        self.masks = MaskArray.from_masks(
-            self.masks, self.composite.height, self.composite.width
-        )
-
-    def _unload(self):
-        # TODO: SLOW: Maybe cause slowdowns?
-        self.masks = self.masks.to_erles(self.composite.height, self.composite.width)
-
-    def _num_annotations(self) -> Dict[str, int]:
-        return {"masks": len(self.masks)}
-
-    def _remove_annotation(self, i):
-        self.masks.pop(i)
-
     def _repr(self) -> List[str]:
-        return [f"Masks: {self.masks}"]
+        return [f"masks: {self.masks}", f"mask_array: {self.mask_array}"]
 
     def as_dict(self) -> dict:
-        return {"masks": self.masks}
+        return {"masks": self.masks, "mask_array": self.mask_array}
+
+
+class SemanticMaskRecordComponent(BaseMasksRecordComponent):
+    def __init__(self, task=tasks.segmentation):
+        super().__init__(task=task)
+
+    def _builder_template(self) -> List[str]:
+        return ["record{task}set_mask(<Mask>)"]
+
+
+class InstanceMasksRecordComponent(BaseMasksRecordComponent):
+    def __init__(self, task=tasks.detection):
+        super().__init__(task=task)
+
+    def _builder_template(self) -> List[str]:
+        return ["record{task}add_masks(<Sequence[Mask]>)"]
+
+
+# class MasksRecordComponent(RecordComponent):
+#     def __init__(self, task=tasks.detection):
+#         super().__init__(task=task)
+#         self.masks = EncodedRLEs()
+
+#     def set_masks(self, masks: Sequence[Mask]):
+#         self.masks = masks
+
+#     def add_masks(self, masks: Sequence[Mask]):
+#         self.masks.extend(self._masks_to_erle(masks))
+
+#     def setup_transform(self, tfm) -> None:
+#         tfm.setup_masks(self)
+
+#     def _masks_to_erle(self, masks: Sequence[Mask]) -> List[Mask]:
+#         width, height = self.composite.img_size
+#         return [mask.to_erles(h=height, w=width) for mask in masks]
+
+#     def _load(self):
+#         self.masks = MaskArray.from_masks(
+#             self.masks, self.composite.height, self.composite.width
+#         )
+
+#     def _unload(self):
+#         # TODO: SLOW: Maybe cause slowdowns?
+#         self.masks = self.masks.to_erles(self.composite.height, self.composite.width)
+
+#     def _num_annotations(self) -> Dict[str, int]:
+#         return {"masks": len(self.masks)}
+
+#     def _remove_annotation(self, i):
+#         self.masks.pop(i)
+
+#     def _repr(self) -> List[str]:
+#         return [f"Masks: {self.masks}"]
+
+#     def as_dict(self) -> dict:
+#         return {"masks": self.masks}
+
+#     def _builder_template(self) -> List[str]:
+#         return ["record{task}add_masks(<Sequence[Mask]>)"]
+
+
+# class SemanticMasksRecordComponent(RecordComponent):
+#     def __init__(self, task=tasks.segmentation):
+#         super().__init__(task=task)
+#         # HACK: unloaded_mask is a hacky solution
+#         self._unloaded_mask: Mask = None
+#         self.masks: Sequence[Mask] = None
+
+#     def set_mask(self, mask: Mask):
+#         self._unloaded_mask = [mask]
+#         # HACK: list here just because is what we need on instance segmentation
+#         self.masks = [mask]
+
+#     # HACK: only here because it's what albumentations call
+#     def set_masks(self, masks: Mask):
+#         self.masks = masks
+#         # assert len(masks) == 1, "can only be a single mask for segmentation"
+#         # self.set_mask(masks[0])
+
+#     def setup_transform(self, tfm) -> None:
+#         tfm.setup_masks(self)
+
+#     def _load(self):
+#         self.masks = MaskArray.from_masks(
+#             self.masks, self.composite.height, self.composite.width
+#         )
+
+#     def _unload(self):
+#         self.masks = None
+
+#     # def _num_annotations(self) -> Dict[str, int]:
+#     #     return {"masks": len(self.masks)}
+
+#     # def _remove_annotation(self, i):
+#     #     self.masks.pop(i)
+
+#     def _repr(self) -> List[str]:
+#         return [f"Masks: {self.masks}"]
+
+#     def _builder_template(self) -> List[str]:
+#         return ["record{task}set_masks(<Sequence[Mask]>)"]
 
 
 class AreasRecordComponent(RecordComponent):

@@ -1,4 +1,5 @@
 from icevision.all import *
+from icevision.models.torchvision import retinanet
 
 
 def test_retinanet_default_param_groups():

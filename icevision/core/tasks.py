@@ -12,3 +12,4 @@ class Task:
 common = Task("common", 0.3)
 detection = Task("detection")
 classification = Task("classification")
+segmentation = Task("segmentation")

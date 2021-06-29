@@ -154,7 +154,7 @@ class VOCMaskParser(VOCBBoxParser):
 
     def template_record(self) -> BaseRecord:
         record = super().template_record()
-        record.add_component(MasksRecordComponent())
+        record.add_component(InstanceMasksRecordComponent())
         return record
 
     def record_id_mask(self, o) -> Hashable:

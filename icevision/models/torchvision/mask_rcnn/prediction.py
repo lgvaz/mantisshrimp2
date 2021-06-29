@@ -122,7 +122,7 @@ def convert_raw_prediction(
     masks = masks_probs > mask_threshold
     masks = MaskArray(masks.squeeze(1))
 
-    pred.pred.add_component(MasksRecordComponent())
+    pred.pred.add_component(InstanceMasksRecordComponent())
     pred.detection.set_masks(masks)
 
     return pred

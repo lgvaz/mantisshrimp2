@@ -14,7 +14,7 @@ from icevision.utils import *
 
 def _resnet_features(model: nn.Module, out_channels: int):
     # remove last layer (fully-connected)
-    modules = list(model.named_children())[:-1]
+    modules = list(model.named_children())[:-2]
     features = nn.Sequential(OrderedDict(modules))
 
     features.out_channels = out_channels

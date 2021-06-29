@@ -13,7 +13,7 @@ def dummy_parser_all_components():
                     FilepathRecordComponent(),
                     InstancesLabelsRecordComponent(),
                     BBoxesRecordComponent(),
-                    MasksRecordComponent(),
+                    InstanceMasksRecordComponent(),
                     KeyPointsRecordComponent(),
                     AreasRecordComponent(),
                     IsCrowdsRecordComponent(),
@@ -51,7 +51,7 @@ def test_parser_parse_fields(dummy_parser_all_components):
 
     assert record.detection.label_ids == [1]
     assert record.detection.bboxes == [BBox.from_xyxy(1, 2, 3, 4)]
-    assert record.detection.masks.erles == [{"size": [420, 480], "counts": b"PlT6"}]
+    assert np.array_equal(record.detection.masks[0].data, np.zeros((1, 420, 480)))
     assert record.detection.areas == [4.2]
     assert record.detection.iscrowds == [False]
     assert record.detection.keypoints == [KeyPoints((1, 1, 1), None)]

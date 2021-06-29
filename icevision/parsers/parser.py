@@ -67,35 +67,23 @@ class Parser(ParserInterface, ABC):
         pass
 
     def parse_dicted(self, show_pbar: bool = True) -> Dict[int, RecordType]:
-        records = {}
+        records = RecordCollection(self.create_record)
 
         for sample in pbar(self, show_pbar):
             try:
                 self.prepare(sample)
-                # TODO: Do we still need idmap?
-                true_record_id = self.record_id(sample)
-                record_id = self.idmap[true_record_id]
-
-                try:
-                    record = records[record_id]
-                    is_new = False
-                except KeyError:
-                    record = self.create_record()
-                    # HACK: fix record_id (needs to be transformed with idmap)
-                    record.set_record_id(record_id)
-                    records[record_id] = record
-                    is_new = True
-
-                self.parse_fields(sample, record=record, is_new=is_new)
+                record_id = self.record_id(sample)
+                record = records.get_by_record_id(record_id)
+                self.parse_fields(sample, record=record, is_new=record.is_new)
 
             except AbortParseRecord as e:
                 logger.warning(
                     "Record with record_id: {} was skipped because: {}",
-                    true_record_id,
+                    record_id,
                     str(e),
                 )
 
-        return dict(records)
+        return records
 
     def _check_path(self, path: Union[str, Path] = None):
         if path is None:
@@ -130,23 +118,17 @@ class Parser(ParserInterface, ABC):
             data_splitter = data_splitter or RandomSplitter([0.8, 0.2])
             records = self.parse_dicted(show_pbar=show_pbar)
 
-            splits = data_splitter(idmap=self.idmap)
-            all_splits_records = []
             if autofix:
                 logger.opt(colors=True).info("<blue><bold>Autofixing records</></>")
-            for ids in splits:
-                split_records = [records[i] for i in ids if i in records]
+                records = records.autofix()
 
-                if autofix:
-                    split_records = autofix_records(split_records, show_pbar=show_pbar)
-
-                all_splits_records.append(split_records)
+            records = records.make_splits(data_splitter)
 
             # self.class_map.lock()
             if cache_filepath is not None:
-                pickle.dump(all_splits_records, open(Path(cache_filepath), "wb"))
+                pickle.dump(records, open(Path(cache_filepath), "wb"))
 
-            return all_splits_records
+            return records
 
     @classmethod
     def _templates(cls) -> List[str]:

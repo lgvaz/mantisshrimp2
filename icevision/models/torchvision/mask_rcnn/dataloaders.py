@@ -74,7 +74,7 @@ def _build_mask_train_sample(record: RecordType):
         height, width = record.img.shape[:-1]
         target["masks"] = torch.zeros((0, height, width), dtype=torch.uint8)
     else:
-        target["masks"] = tensor(record.detection.masks.data, dtype=torch.uint8)
+        target["masks"] = tensor(record.detection.mask_array.data, dtype=torch.uint8)
 
     return image, target
 

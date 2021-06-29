@@ -67,7 +67,7 @@ def test_crop_transform_empty(records, check_attributes_on_component):
     # assert "keypoints" not in tfm_ds.tfm.tfms.processors.keys()
     assert len(tfmed.detection.label_ids) == 0
     assert len(tfmed.detection.bboxes) == 0
-    assert len(tfmed.detection.masks) == 0
+    assert not tfmed.detection.mask_array.data.any()
     assert len(tfmed.detection.iscrowds) == 0
     assert len(tfmed.detection.areas) == 0
     check_attributes_on_component(tfmed)

@@ -1,4 +1,5 @@
 from icevision.all import *
+from icevision.models.torchvision import keypoint_rcnn
 
 
 def test_keypoints_rcnn_model():

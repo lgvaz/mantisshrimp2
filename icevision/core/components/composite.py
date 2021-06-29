@@ -49,6 +49,13 @@ class TaskComposite:
         self.components.add(component)
         self.set_task_components(self.components)
 
+    def remove_component_by_type(self, component_type: TaskComponent):
+        for component in self.components:
+            if isinstance(component, component_type):
+                break
+        self.components.remove(component)
+        self.set_task_components(self.components)
+
     def set_task_components(self, components: Sequence[TaskComponent]):
         task_components = defaultdict(list)
         # example: task_components['detect'] = (LabelsComponent, BBoxesComponent, ...)

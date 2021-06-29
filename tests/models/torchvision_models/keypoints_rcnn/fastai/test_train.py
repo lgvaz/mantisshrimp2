@@ -1,5 +1,6 @@
 import pytest
 from icevision.all import *
+from icevision.models.torchvision import keypoint_rcnn
 
 
 def test_fastai_keypoints_rcnn_train(ochuman_keypoints_dls):

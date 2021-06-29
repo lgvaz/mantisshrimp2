@@ -1,5 +1,6 @@
 import pytest
 from icevision.all import *
+from icevision.models.ross import efficientdet
 
 
 # TODO: Duplicated fixture between here and torchvision:test_dataloaders

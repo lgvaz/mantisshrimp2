@@ -29,7 +29,7 @@ def test_bbox_parser(coco_dir, coco_bbox_parser):
     assert len(records) == 5
 
     record = records[0]
-    assert record.record_id == 0
+    assert record.record_id == 343934
     assert record.filepath == coco_dir / "images/000000343934.jpg"
     assert record.width == 640
     assert record.height == 480
@@ -52,25 +52,144 @@ def test_mask_parser(coco_mask_parser):
     assert len(records) == 5
 
     record = records[0]
-    assert record.detection.masks.erles == [
-        {
-            "size": [480, 640],
-            "counts": b"nWb24W10Y<=VC1`<6UC8a<T1O001O001O0cERNi7n1oG^Nm7c1iGiNT8W1hGPO"
-            b"U8P1jGTOS8m0kGWOS8h0lG]OQ8b0nGAR8>lGES8:lGIS86lGMS83kG0T8OkG4T8KkG8T8HjG;"
-            b"V8CiG`0V8@iGb0V8]OkGd0T8[OlGg0S8XOmGj0R8TOoGn0P8POQHR1n7lNSHV1m7gNUHZ1j"
-            b"7dNWH^1h7`NYHb1f7]NZHe1e7ZN\\Hg1c7XN]Hj1b7UN^Hl1c7RN]Ho1c7PN^HQ2a7nM_HS2b"
-            b"7kM^HV2b7iM_HX2`7gM`HZ2a7dM_H]2a7bM_H_2a7aM_H`2a7^M_Hc2a7]M^Hd2b7\\M^Hd2c"
-            b"7[M\\Hg2c7XM]Hi2c7WM\\Hj2e7UM[Hk2e7TM[Hn2e7QM[Ho2e7QMZHP3f7oL[HQ3f7nLZHR3"
-            b"f7nLYHS3g7mLYHS3g7nLXHQ3i7PMUHQ3l7oLSHQ3m7oLSHQ3m7PMQHQ3o7PMPHP3P8QMoGo2Q"
-            b"8QMnGo2S8RMlGn2U8RMjGn2V8SMhGn2X8RMhGn2X8SMfGn2Z8SMeGm2[8TMdGk2]8UMbGl2_8"
-            b"TM`Gl2`8UM_Gk2a8VMYGo2g8QMoFY3Q9Z110001O0000000O100000001O000O100000000O1"
-            b"O1N3N1O1O1O1O1N2O1N2O2M2N2O1N2N2O1N2O1N2O2M2N2O1N3N1N2N3M2N2N3M2O1O1O2O00"
-            b"001O00001O0001O00000001O00000001O00000O10000O100O2O0O10001N101N100O2O001N"
-            b"101N1O101N1O2N1O2N1O101O001O0O2O001O001O001N101O001O00001O001O001O001O001"
-            b"O0000O100O1O2O0O1O100O1O100O001O100O1O010O1O100O00100O1O00100N2O00@hKUF\\"
-            b"4k9iKkE[4V:71O000O10001O000001O10O01O1O010O100O101N1O101N100O2O0O101O0000"
-            b"1O1O2N1O2NYM\\F4b9WN]Fd0b0h0o8`NeFe0?k0j8[NnFg0:o0f8XNUGd09S1a8YNXGa09W1]"
-            b"8WN]G>:[1X8UNaG=9_1T8QNjG;5d1o7lMTH;0k1i7eM`H;JQ2^9hMgFX2Q;010O10O010O1O1"
-            b"00O1O1O1N2O1N2N2N101N1O2O0O2N2O0O5G=^Ob0^OXTS2",
-        }
+    assert len(record.detection.masks) == 1
+    assert record.detection.masks[0].points == [
+        [
+            457.3,
+            258.92,
+            458.38,
+            276.22,
+            467.03,
+            289.19,
+            473.51,
+            305.41,
+            483.24,
+            334.59,
+            492.97,
+            359.46,
+            496.22,
+            390.81,
+            492.97,
+            415.68,
+            478.92,
+            397.3,
+            472.43,
+            382.16,
+            464.86,
+            361.62,
+            452.97,
+            340,
+            437.84,
+            334.59,
+            428.11,
+            337.84,
+            415.14,
+            354.05,
+            387.03,
+            373.51,
+            362.16,
+            361.62,
+            339.46,
+            351.89,
+            311.35,
+            348.65,
+            307.03,
+            352.97,
+            301.62,
+            363.78,
+            295.14,
+            373.51,
+            283.24,
+            392.97,
+            274.59,
+            402.7,
+            231.35,
+            409.19,
+            210.81,
+            403.78,
+            190.27,
+            383.24,
+            182.7,
+            367.03,
+            185.95,
+            336.76,
+            197.84,
+            312.97,
+            205.41,
+            306.49,
+            229.19,
+            289.19,
+            254.05,
+            280.54,
+            256.22,
+            258.92,
+            234.59,
+            242.7,
+            220.54,
+            247.03,
+            208.65,
+            258.92,
+            202.16,
+            271.89,
+            180.54,
+            285.95,
+            177.3,
+            287.03,
+            175.14,
+            266.49,
+            178.38,
+            250.27,
+            176.22,
+            236.22,
+            175.14,
+            222.16,
+            188.11,
+            209.19,
+            212.97,
+            212.43,
+            234.59,
+            220,
+            256.22,
+            223.24,
+            297.3,
+            227.57,
+            318.92,
+            234.05,
+            330.81,
+            235.14,
+            351.35,
+            226.49,
+            360,
+            218.92,
+            376.22,
+            216.76,
+            398.92,
+            217.84,
+            418.38,
+            213.51,
+            420.54,
+            201.62,
+            419.46,
+            196.22,
+            435.68,
+            183.24,
+            449.73,
+            175.68,
+            468.11,
+            176.76,
+            464.86,
+            192.97,
+            460.54,
+            196.22,
+            458.38,
+            207.03,
+            464.86,
+            221.08,
+            468.11,
+            234.05,
+            469.19,
+            240.54,
+            468.11,
+            243.78,
+        ]
     ]

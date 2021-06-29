@@ -32,5 +32,5 @@ def test_plot_losses(fridge_ds, backbone, monkeypatch):
     )
     assert len(samples_plus_losses) == len(ds) == len(preds)
 
-    loss_per_image = get_samples_losses(samples_plus_losses)
+    loss_per_image = models.get_samples_losses(samples_plus_losses)
     assert "filepath" in loss_per_image[0].keys()

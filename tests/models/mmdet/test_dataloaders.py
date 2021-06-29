@@ -34,7 +34,7 @@ def mask_records(img, labels, bboxes, masks, class_map):
             ImageRecordComponent(),
             InstancesLabelsRecordComponent(),
             BBoxesRecordComponent(),
-            MasksRecordComponent(),
+            InstanceMasksRecordComponent(),
         )
     )
     record.set_record_id(1)
@@ -94,7 +94,7 @@ def _test_common_mmdet_mask_batch(batch):
     rec = recs[0]
     assert isinstance(rec.detection.label_ids, list)
     assert isinstance(rec.detection.bboxes[0], BBox)
-    assert isinstance(rec.detection.masks, MaskArray)
+    assert isinstance(rec.detection.mask_array, MaskArray)
     assert isinstance(rec.height, int)
     assert isinstance(rec.width, int)
     assert isinstance(rec.record_id, int)
@@ -128,7 +128,7 @@ def test_mmdet_mask_rcnn_build_infer_batch(mask_records):
     rec = recs[0]
     assert isinstance(rec.detection.label_ids, list)
     assert isinstance(rec.detection.bboxes[0], BBox)
-    assert isinstance(rec.detection.masks, MaskArray)
+    assert isinstance(rec.detection.mask_array, MaskArray)
     assert isinstance(rec.height, int)
     assert isinstance(rec.width, int)
     assert isinstance(rec.record_id, int)

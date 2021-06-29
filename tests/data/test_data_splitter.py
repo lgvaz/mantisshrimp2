@@ -3,25 +3,31 @@ from icevision.all import *
 
 
 @pytest.fixture
-def idmap():
-    return IDMap(["file1", "file2", "file3", "file4"])
+def records():
+    def create_record_func():
+        return BaseRecord([])
+
+    records = RecordCollection(create_record_func)
+    for record_id in ["file1", "file2", "file3", "file4"]:
+        records.get_by_record_id(record_id)
+    return records
 
 
-def test_single_split_splitter(idmap):
+def test_single_split_splitter(records):
     data_splitter = SingleSplitSplitter()
-    splits = data_splitter(idmap)
-    assert splits == [[0, 1, 2, 3]]
+    splits = data_splitter(records)
+    assert splits == [["file1", "file2", "file3", "file4"]]
 
 
-def test_random_splitter(idmap):
+def test_random_splitter(records):
     data_splitter = RandomSplitter([0.6, 0.2, 0.2], seed=42)
-    splits = data_splitter(idmap)
-    np.testing.assert_equal(splits, [[1, 3], [0], [2]])
+    splits = data_splitter(records)
+    np.testing.assert_equal(splits, [["file2", "file4"], ["file1"], ["file3"]])
 
 
-def test_fixed_splitter(idmap):
+def test_fixed_splitter(records):
     presplits = [["file4", "file3"], ["file2"], ["file1"]]
 
     data_splitter = FixedSplitter(presplits)
-    splits = data_splitter(idmap=idmap)
-    assert splits == [[3, 2], [1], [0]]
+    splits = data_splitter(records)
+    assert splits == presplits

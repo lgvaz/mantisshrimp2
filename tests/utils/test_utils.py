@@ -47,7 +47,7 @@ def normalize_denormalize():
 
 def test_get_stats():
     l = list(np.arange(10))
-    result = get_stats(l)
+    result = models.get_stats(l)
 
     expected = {
         "min": 0,
@@ -93,7 +93,7 @@ def test_sort_losses():
         {"stuff": 0.2, "pred": 2},
     ]
 
-    sorted_samples, sorted_preds, annotations = sort_losses(samples, preds)
+    sorted_samples, sorted_preds, annotations = models.sort_losses(samples, preds)
 
     assert [s.losses for s in sorted_samples] == sorted_samples_ex
     assert sorted_preds == sorted_preds_ex
@@ -116,6 +116,6 @@ def test_get_weighted_sum():
     br = _set_losses_lrc(s)
     expected = {"loss1": 1, "loss2": 1, "loss3": 1, "loss4": 1, "loss_weighted": 1.0}
 
-    result = get_weighted_sum(br, weights)
+    result = models.get_weighted_sum(br, weights)
 
     assert result.losses["loss_weighted"] == expected["loss_weighted"]

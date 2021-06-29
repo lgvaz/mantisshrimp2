@@ -1,4 +1,5 @@
 from icevision.utils.utils import *
+from icevision.utils.indexable_dict import *
 from icevision.utils.torch_utils import *
 from icevision.utils.imageio import *
 from icevision.utils.get_files import *

@@ -66,7 +66,7 @@ def test_parser(data, tmpdir):
     #     "labels",
     #     "bboxes",
     # }
-    assert record.record_id == 1
+    assert record.record_id == 42
     assert record.filepath == Path(__file__)
     assert len(record.detection.class_map) == 3
     assert record.detection.class_map.get_by_name("background") == 0

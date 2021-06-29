@@ -127,14 +127,17 @@ class AlbumentationsBBoxesComponent(AlbumentationsAdapterComponent):
 
 
 class AlbumentationsMasksComponent(AlbumentationsAdapterComponent):
-    def setup_masks(self, record):
-        self.adapter._albu_in["masks"] = list(record.masks.data)
+    def setup_masks(self, record_component):
+        self._record_component = record_component
+        self.adapter._albu_in["masks"] = list(record_component.mask_array.data)
         self.adapter._collect_ops.append(CollectOp(self.collect))
 
     def collect(self, record):
         masks = self.adapter._filter_attribute(self.adapter._albu_out["masks"])
         masks = MaskArray(np.array(masks))
-        record.detection.set_masks(masks)
+        self._record_component.set_mask_array(masks)
+        # HACK: Not sure if necessary
+        self._record_component = None
 
 
 class AlbumentationsKeypointsComponent(AlbumentationsAdapterComponent):

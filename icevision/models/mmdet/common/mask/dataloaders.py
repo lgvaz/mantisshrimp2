@@ -109,6 +109,6 @@ def _masks(record):
     if len(record.detection.masks) == 0:
         raise RuntimeError("Negative samples still needs to be implemented")
     else:
-        mask = record.detection.masks.data
+        mask = record.detection.mask_array.data
         _, h, w = mask.shape
         return BitmapMasks(mask, height=h, width=w)

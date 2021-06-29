@@ -1,4 +1,5 @@
 from icevision.all import *
+from icevision.models.torchvision import faster_rcnn
 import albumentations as A
 import pytest
 

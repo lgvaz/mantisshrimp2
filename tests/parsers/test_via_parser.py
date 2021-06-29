@@ -8,7 +8,7 @@ def test_bbox_parser(via_dir, via_bbox_class_map):
     assert len(records) == 2
 
     record = records[0]
-    assert record.record_id == 0
+    assert record.record_id == "IMG_4908.jpg"
     assert record.filepath == via_dir / "IMG_4908.jpg"
     assert record.width == 640
     assert record.height == 480

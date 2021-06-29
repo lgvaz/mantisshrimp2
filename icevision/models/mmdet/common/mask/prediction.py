@@ -131,7 +131,7 @@ def convert_raw_prediction(
             ImageRecordComponent(),
             InstancesLabelsRecordComponent(),
             BBoxesRecordComponent(),
-            MasksRecordComponent(),
+            InstanceMasksRecordComponent(),
         )
     )
     pred.detection.set_class_map(record.detection.class_map)

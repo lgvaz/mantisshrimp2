@@ -1,5 +1,6 @@
 import pytest
 from icevision.all import *
+from icevision.models.ross import efficientdet
 from icevision.models.ross.efficientdet.backbones import *
 
 

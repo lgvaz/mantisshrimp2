@@ -1,5 +1,6 @@
 import pytest
 from icevision.all import *
+from icevision.models.torchvision import faster_rcnn, mask_rcnn, keypoint_rcnn
 
 
 @pytest.fixture
