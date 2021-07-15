@@ -1,0 +1,1 @@
+docker build -t icevision-dev -f ./icevision-dev.Dockerfile .

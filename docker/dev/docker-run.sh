@@ -1,0 +1,1 @@
+docker run --gpus all -it --ipc=host --name ice-container-1 --rm --net=host icevision-dev
