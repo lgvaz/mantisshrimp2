@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  icevision:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: ice
+    tty: true
+    volumes:
+      - ../:/root/

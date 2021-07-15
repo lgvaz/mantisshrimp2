@@ -1,0 +1,11 @@
+{
+	"name": "Icevision",
+	"dockerComposeFile": ["docker-compose.yaml"],
+	"service": "icevision",
+	"runServices": ["icevision"],
+	"workspaceFolder": "/root",
+	"extensions": [
+		"ms-python.python",
+		"ms-azuretools.vscode-docker"
+	],
+}
