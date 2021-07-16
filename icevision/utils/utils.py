@@ -16,9 +16,12 @@ __all__ = [
     "denormalize_imagenet",
     "denormalize_mask",
     "patch_class_to_main",
+    "flatten",
+    "Dictionary",
 ]
 
 from icevision.imports import *
+from addict import Dict as _Dict
 
 
 def notnone(x):
@@ -109,3 +112,50 @@ def patch_class_to_main(cls):
     setattr(__main__, cls.__name__, cls)
     cls.__module__ = "__main__"
     return cls
+
+
+def flatten(x: Any) -> List[Any]:
+    import pandas as pd
+
+    flattened_list = []
+    for item in x:
+        if isinstance(item, (tuple, list, np.ndarray, pd.Series)):
+            [flattened_list.append(i) for i in item]
+        else:
+            flattened_list.append(item)
+    return flattened_list
+
+
+def unroll_dict(x: dict) -> List[dict]:
+    """
+    Unroll a dictionary into a list of dictionaries where the key is repeated.
+    Useful when you want to throw a dictionary into a for loop
+
+    Args:
+        x (dict)
+
+    Returns:
+        List[dict]
+
+    Example:
+        x = dict(
+            location=[[0.8, 0.2], [0.9, 0.1]],
+            lighting=[[0.6, 0.4], [0.2, 0.8]]
+        )
+        unroll_dict(x) == [
+            {"location": [0.8, 0.2], "lighting": [0.6, 0.4]},
+            {"location": [0.9, 0.1], "lighting": [0.2, 0.8]},
+        ]
+    """
+    return [dict(zip(x, t)) for t in zipsafe(*x.values())]
+
+
+[
+    {"location": [0.8, 0.2], "lighting": [0.6, 0.4]},
+    {"location": [0.9, 0.1], "lighting": [0.2, 0.8]},
+]
+
+
+class Dictionary(_Dict):
+    def __missing__(self, key):
+        raise KeyError(key)
