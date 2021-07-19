@@ -22,4 +22,5 @@ def test_soft_dependencies():
         "sklearn": True,
         "mmdet": True,
         "yolov5": True,
+        "timm": True,
     }

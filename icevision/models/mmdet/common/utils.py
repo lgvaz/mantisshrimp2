@@ -60,15 +60,39 @@ def build_model(
         cfg.model.roi_head.bbox_head.num_classes = num_classes - 1
         cfg.model.roi_head.mask_head.num_classes = num_classes - 1
 
-    if (pretrained == False) or (weights_path is not None):
+    # When using Timm backbone, loading the pretained weights are done icevision and not by mmdet code
+    # Check out here below
+    # Set cfg.model.pretrained to avoid mmdet loading them
+    if pretrained == True and (
+        isinstance(backbone, MMDetTimmBackboneConfig) and backbone.pretrained == True
+    ):
+        cfg.model.pretrained = None  # Timm pretrained backbones
+    elif (pretrained == False) or (weights_path is not None):
         cfg.model.pretrained = None
 
     _model = build_detector(cfg.model, cfg.get("train_cfg"), cfg.get("test_cfg"))
     _model.init_weights()
 
-    if pretrained and (weights_path is not None):
-        load_checkpoint(_model, str(weights_path))
+    # Load pretrained weights either:
+    # - by loading the whole pretrained model (COCO in general)
+    # - or only the pretrained backbone like Timm ones
+    if pretrained:
+        if weights_path is not None:
+            print(
+                f"loading pretrained weights from user-provided url: {backbone.weights_url}"
+            )
+            load_checkpoint(_model, str(weights_path))
+        # We handle loading Timm (backbone) pretrained weights here
+        # the weights_url are stored in the backbone dict
+        elif _model.backbone.weights_url is not None:
+            weights_url = _model.backbone.weights_url
+            print(f"loading default pretrained weights: {weights_url}")
+            weights_path = download_weights(backbone.model_name, weights_url)
+            load_checkpoint(_model, str(weights_path))
 
-    _model.param_groups = MethodType(param_groups, _model)
+    if isinstance(backbone, MMDetTimmBackboneConfig):
+        _model.param_groups = MethodType(param_groups_timm, _model)
+    else:
+        _model.param_groups = MethodType(param_groups, _model)
 
     return _model

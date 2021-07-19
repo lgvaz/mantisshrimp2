@@ -17,7 +17,7 @@ class TestBboxModels:
         train_dl = model_type.train_dl(train_ds, batch_size=2)
         valid_dl = model_type.valid_dl(valid_ds, batch_size=2)
 
-        backbone = model_type.backbones.resnet50_fpn_1x()
+        backbone = model_type.backbones.mmdet.resnet50_fpn_1x()
         backbone.config_path = samples_source / backbone.config_path
 
         model = model_type.model(backbone=backbone, num_classes=5)
@@ -71,7 +71,7 @@ def mask_dls_model(coco_mask_records, samples_source):
     train_dl = model_type.train_dl(train_ds, batch_size=2)
     valid_dl = model_type.valid_dl(valid_ds, batch_size=2)
 
-    backbone = model_type.backbones.resnet50_fpn_1x()
+    backbone = model_type.backbones.mmdet.resnet50_fpn_1x()
     backbone.config_path = samples_source / backbone.config_path
 
     model = model_type.model(backbone=backbone, num_classes=81)

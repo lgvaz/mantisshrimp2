@@ -27,6 +27,7 @@ jobs:
         pip install torch=="1.8.1+cpu" torchvision=="0.9.1+cpu" -f https://download.pytorch.org/whl/torch_stable.html
         pip install mmcv-full=="1.3.2+torch.1.8.0+cpu" -f https://download.openmmlab.com/mmcv/dist/index.html --use-deprecated=legacy-resolver
         pip install mmdet==2.12.0 --upgrade
+        pip install timm
         pip install -e ".[all,dev]"
         pip install yolov5-icevision --upgrade
 
